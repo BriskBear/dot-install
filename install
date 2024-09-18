@@ -23,7 +23,7 @@ then
   # Copy all of the config files to the config dir
   for file in ${cfg_files[@]}
   do
-    [[ -r $file ]] && ( cp $file $cfg_dir/ ) || reply -e "Failed to copy $file"
+    [[ -r lib/${target}/${file} ]] && ( cp lib/${target}/${file} $cfg_dir/ ) || reply -e "Failed to copy $file"
   done
 
   reply -i "$target configured"
