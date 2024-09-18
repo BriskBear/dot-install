@@ -1,0 +1,32 @@
+#!/usr/bin/bash
+
+. lib/reply.sh  # Message Levels
+. lib/stamp.sh  # 4 digit-timestamp
+
+target="$1"
+
+if [[ -d lib/$target ]] 
+then
+  . lib/${target}/env.list  # Source the target environment variables
+
+  # Setup the target configuration home
+  cfg_dir=${XDG_CONFIG_HOME:-$HOME/.config}/$target
+  bak=$HOME/.local/.bak
+
+  # Backup the default config in $HOME/.local/.bak and remove from the system
+  [[ -d $bak      ]] || mkdir -p $bak
+  [[ -d $del_dir  ]] && sudo tar -cjf ${bak}/${target}-$(stamp).tbz2 $del_dir --remove-files 2>/dev/null
+
+  # Create the target directory in XDG_CONFIG_HOME ($HOME/.config if unset)
+  mkdir -p $cfg_dir || reply -e "Failed to create $cfg_dir"
+
+  # Copy all of the config files to the config dir
+  for file in ${cfg_files[@]}
+  do
+    [[ -r $file ]] && ( cp $file $cfg_dir/ ) || reply -e "Failed to copy $file"
+  done
+
+  reply -i "$target configured"
+else
+  reply -e "lib/$target is not yet supported"
+fi
